@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Web.Mvc;
 using Vidly.Models;
@@ -20,11 +21,18 @@ namespace Vidly.Controllers
             _movieContext.Dispose(); 
         }
 
+        // GET: Movie
+        public ViewResult Index()
+        {
+            var movies = _movieContext.Movie.Include(m => m.Genre).ToList();
+
+            return View(movies.ToList());
+        }
         public ActionResult MovieFormAdd()
         { 
             var genre = _movieContext.Genre.ToList();
             var movieViewModel = new NewMovieViewModel
-            { 
+            {
                 Genres = genre
             };
 
@@ -32,11 +40,20 @@ namespace Vidly.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save (Movie movie)
         {
+            if (!ModelState.IsValid)
+            {
+                var viewModel = new NewMovieViewModel(movie)
+                {
+                    Genres = _movieContext.Genre.ToList()
+                };
+                return View("MovieFormAdd", viewModel);
+            }
             if (movie.Id == 0)
             {
-                movie.DateAdded = System.DateTime.Today;
+                movie.DateAdded = System.DateTime.Now;
                 _movieContext.Movie.Add(movie);
             }
             else
@@ -45,7 +62,8 @@ namespace Vidly.Controllers
                 movieInDB.strMovieName = movie.strMovieName;
                 movieInDB.DateAdded = System.DateTime.Today;
                 movieInDB.ReleaseDate = movie.ReleaseDate;
-                movieInDB.GenreId = movie.GenreId;                
+                movieInDB.GenreId = movie.GenreId;
+                movieInDB.NumberInStock = movie.NumberInStock;
             }
             _movieContext.SaveChanges();
 
@@ -57,20 +75,13 @@ namespace Vidly.Controllers
             var movie = _movieContext.Movie.Single(m => m.Id == id);
             if (movie == null)
                 return HttpNotFound();
-            var movieModelView = new NewMovieViewModel
+            var movieModelView = new NewMovieViewModel(movie)
             {
-                Movie = movie,
-                //Genres = _movieContext.Genre.ToList()
+                Genres = _movieContext.Genre.ToList()
             };
 
             return View("MovieFormAdd", movieModelView);
         }
-        // GET: Movie
-        public ViewResult Index()
-        {
-            var movies = _movieContext.Movie.Include(m => m.Genre).ToList();
-
-            return View(movies.ToList());
-        }     
+          
     }
 }
