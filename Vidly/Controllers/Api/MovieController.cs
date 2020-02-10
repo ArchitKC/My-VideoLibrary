@@ -1,9 +1,11 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Vidly.Dtos;
 using Vidly.Models;
 
 namespace Vidly.Controllers.Api
@@ -22,7 +24,7 @@ namespace Vidly.Controllers.Api
         public IHttpActionResult GetMovie()
         {
             var movie = _contextMovie.Movie.ToList();
-            return Ok(movie);
+            return Ok(movie.Select(Mapper.Map<Movie,MovieDto>));
         }
 
         //Get api/Movie/1  
@@ -33,24 +35,26 @@ namespace Vidly.Controllers.Api
             if (movie == null)
                 return NotFound();
 
-            return Ok(movie);
+            return Ok(Mapper.Map<Movie,MovieDto>(movie));
         }
 
         //POST api/Movie
         [HttpPost]
-        public IHttpActionResult CreateMovie(Movie movie)
+        public IHttpActionResult CreateMovie(MovieDto movieDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
+            var movie = Mapper.Map<MovieDto, Movie>(movieDto);
             _contextMovie.Movie.Add(movie);
             _contextMovie.SaveChanges();
-            return Created(new Uri(Request.RequestUri + "/" + movie.Id), movie);
+            movieDto.Id = movie.Id;
+            return Created(new Uri(Request.RequestUri + "/" + movie.Id), movieDto);
         }
 
         //PUT api/Movie/1
         [HttpPut]
-        public IHttpActionResult UpdateMovie(int id, Movie movie)
+        public IHttpActionResult UpdateMovie(int id, MovieDto movieDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -60,11 +64,8 @@ namespace Vidly.Controllers.Api
             if (movieInDB == null)
                 return NotFound();
 
-            movieInDB.strMovieName = movie.strMovieName;
-            movieInDB.DateAdded = System.DateTime.Today;
-            movieInDB.ReleaseDate = movie.ReleaseDate;
-            movieInDB.GenreId = movie.GenreId;
-            movieInDB.NumberInStock = movie.NumberInStock;
+            Mapper.Map(movieDto, movieInDB);
+
             _contextMovie.SaveChanges();
 
             return Ok();
