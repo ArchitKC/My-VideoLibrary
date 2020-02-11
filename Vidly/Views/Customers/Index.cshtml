@@ -9,31 +9,63 @@
 
 <h2>Customers</h2>
 <p>
-    <a href='@Url.Action("CustomerForm","Customers")' class="btn btn-primary">Create New</a>
+    @*<a href='@Url.Action("CustomerForm","Customers")' class="btn btn-primary">Create New</a>*@
+    @Html.ActionLink("New Customer", "CustomerForm", "Customers", null, new { @class = "btn btn-primary" })
 </p>
 
-@if (!Model.Any())
-{
-    <p>We don't have any customers yet.</p>
+<table id="customer" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Membership Type</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {   
+            var table = $("#customer").DataTable({
+                ajax: {
+                    url: "/api/customers",
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "customerName",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/edit/" + customer.Id + "'>" + customer.customerName + "</a>";
+                        }
+                    },
+                    {
+                        data: "MemberShipType.Name"
+                    },
+                    {
+                        data: "Id",
+                        render: function (data) {
+                            return "<button class='btn-link js-delete' data-customer-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+            });
+            $("#customer").on("click", ".js-delete", function () {
+                var button = $(this);
+                bootbox.confirm("Are you sure to delete this customer", function (result) {
+                    if (result) {
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                                table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
 }
-else
-{
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>Customer</th>
-                <th>Membership Type</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var customer in Model)
-            {
-                <tr>
-                    @*<td>@customer.customerName</td>*@
-                    <td>@Html.ActionLink(customer.customerName, "Edit", "Customers", new { id = customer.Id }, null)</td>
-                    <td>@customer.MemberShipType.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+

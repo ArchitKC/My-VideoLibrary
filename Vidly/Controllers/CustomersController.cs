@@ -32,9 +32,9 @@ namespace Vidly.Controllers
         }
         public ViewResult Index()
         {
-            var customers = _context.Customers.Include(c=>c.MemberShipType).ToList(); 
+            //var customers = _context.Customers.Include(c=>c.MemberShipType).ToList(); 
 
-            return View(customers.ToList());
+            return View();
         }
 
         [HttpPost]

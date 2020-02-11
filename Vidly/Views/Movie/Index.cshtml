@@ -11,7 +11,7 @@
     <a href='@Url.Action("MovieFormAdd","Movie")' class="btn btn-primary">Create New</a>
 </p>
 
-<table class="table table-bordered table-hover">
+<table id="movie" class="table table-bordered table-hover">
     <thead>
         <tr>
             <th>Movie</th>
@@ -30,3 +30,12 @@
         }
     </tbody>
 </table>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#movie").DataTable();
+        });
+    </script>
+
+}
