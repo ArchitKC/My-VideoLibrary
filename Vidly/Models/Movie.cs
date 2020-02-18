@@ -26,5 +26,8 @@ namespace Vidly.Models
         [Range(1,20)]
         [Display(Name = "Number of Stocks")]
         public byte NumberInStock { get; set; }
+
+        [Display(Name ="Available Count")]
+        public byte NumberAvailable { get; set; }
     }
 }

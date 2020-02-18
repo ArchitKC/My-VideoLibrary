@@ -26,6 +26,7 @@
             <td>@Html.ActionLink(movieItem.strMovieName, "Edit", "Movie", new { id = movieItem.Id }, null)</td> 
             <td>@movieItem.Genre.Name</td>
             <td>@movieItem.NumberInStock</td>
+            <td>@movieItem.NumberAvailable</td>
         </tr>
         }
     </tbody>
