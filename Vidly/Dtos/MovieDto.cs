@@ -12,10 +12,12 @@ namespace Vidly.Dtos
 
         [Required]
         [StringLength(255)]
-        public string strMovieName { get; set; } 
+        public string strMovieName { get; set; }
 
         [Required]
         public byte GenreId { get; set; }
+
+        public GenreDto Genre { get; set; }
 
         public DateTime DateAdded { get; set; }
 

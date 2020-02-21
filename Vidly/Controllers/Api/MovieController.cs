@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Linq; 
 using System.Web.Http;
 using Vidly.Dtos;
 using Vidly.Models;
+using System.Data.Entity;
 
 namespace Vidly.Controllers.Api
 {
@@ -23,7 +22,9 @@ namespace Vidly.Controllers.Api
         //GET api/Movie
         public IEnumerable<MovieDto> GetMovies(string query = null)
         {
-            var moviesQuery = _contextMovie.Movie.Where(m => m.NumberAvailable > 0);
+            var moviesQuery = _contextMovie.Movie
+                .Include(m => m.Genre)
+                .Where(m => m.NumberAvailable > 0);
 
             if (!String.IsNullOrWhiteSpace(query))
                 moviesQuery = moviesQuery.Where(m => m.strMovieName.Contains(query));
@@ -89,6 +90,8 @@ namespace Vidly.Controllers.Api
             if (movieInDB == null)
                 return NotFound();
 
+            if (movieInDB.NumberAvailable != movieInDB.NumberInStock)
+                return BadRequest();
             _contextMovie.Movie.Remove(movieInDB);
             _contextMovie.SaveChanges();
             return Ok();

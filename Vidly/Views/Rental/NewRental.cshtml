@@ -17,12 +17,17 @@
     <div class="form-group">
         <label>Movie</label>
         <div class="tt-container">
-            <input id="movies" name="movie" data-rule-atLeastOneMovie="true" type="text" value="" class="form-control" />
+            <input id="movie" name="movie" data-rule-atLeastOneMovie="true" type="text" value="" class="form-control" />
         </div>
     </div>
 
-    
 
+    <div class="row">
+        <div class="col-md-4 col-sm-4">
+            <ul id="movies" class="list-group"></ul>
+        </div>
+    </div>    
+    
     <button class="btn btn-primary">Submit</button>
 </form>
 
@@ -64,14 +69,17 @@
                 }
             });
 
-            $('#movies').typeahead({
+            $('#movie').typeahead({
                 minLength: 3,
                 highlight: true
             }, {
-                    name: 'movies',
+                    name: 'movie',
                     display: 'strMovieName',
                     source: movies
                 }).on("typeahead:select", function (e, movie) {
+                    $("#movies").append("<li class='list-group-item'>" + movie.strMovieName + "</li>");
+
+                    $("#movie").typeahead("val", "");
                     vm.movieIds.push(movie.Id);
                 });
 
@@ -102,7 +110,12 @@
                             validator.resetForm();
                         })
                         .fail(function () {
-                            toastr.error("Something unexpected happened.");
+                            toastr.error("Some of the movies are not available.");
+                            $("#movies").empty();
+
+                            vm = { movieIds: [] };
+
+                            validator.resetForm();
                         });
 
                     return false;

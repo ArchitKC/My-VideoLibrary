@@ -23,10 +23,8 @@ namespace Vidly.Controllers
 
         // GET: Movie
         public ViewResult Index()
-        {
-            var movies = _movieContext.Movie.Include(m => m.Genre).ToList();
-
-            return View(movies.ToList());
+        { 
+            return View();
         }
         public ActionResult MovieFormAdd()
         { 
