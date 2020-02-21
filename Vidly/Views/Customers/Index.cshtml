@@ -59,6 +59,9 @@
                             method: "DELETE",
                             success: function () {
                                 table.row(button.parents("tr")).remove().draw();
+                            },
+                            error: function () {
+                                toastr.error("Customer already rented and hence can't be deleted");
                             }
                         });
                     }

@@ -86,7 +86,7 @@ namespace Vidly.Controllers.Api
         {
             var customerinDB = _contextCustomer.Customers.SingleOrDefault(c => c.Id == id);
 
-            var rentalinDB = _contextCustomer.NewRentals.SingleOrDefault(c=>c.Customer.Id == id);
+            var rentalinDB = _contextCustomer.NewRentals.FirstOrDefault(c=>c.Customer.Id == id);
 
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -95,7 +95,7 @@ namespace Vidly.Controllers.Api
                 return NotFound();
 
             if (rentalinDB != null)
-                return BadRequest("Customer already rented and hence can't be deleted");
+                return NotFound();
 
             _contextCustomer.Customers.Remove(customerinDB);
             _contextCustomer.SaveChanges();
